@@ -1,0 +1,33 @@
+body {
+	font-family: Arial, Verdana;
+	font-size: 90%;
+	color: #444444;
+	background-color: #f8f8f8;
+}
+#desc {
+	font-weight: bold;
+}
+li {
+	line-height: 1.6em;
+}
+table {
+	border-spacing: 0px;
+}
+th, td {
+	padding: 5px 30px 5px 10px;
+	font-size: 90%;
+	text-align: left;
+	background-color: #e0e9f0;
+	border: 1px solid #aaaaaa;
+}
+tr.head th {
+	color: #fff;
+	background-color: #90b4d6;
+	border: 2px solid #FF0000;
+}
+tr.even td, tr.even th {
+	background-color: #e8ffff;
+}
+img {
+	border: 4px solid black;
+}
