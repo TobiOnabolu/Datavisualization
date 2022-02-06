@@ -8,8 +8,9 @@ d3.csv("resources/Kaggle-modified-Suddharshan.csv", function(data){ //this how l
         data[i].author = data[i]["Gregory Sward"];
         data[i].rating = parseFloat(data[i]["4.7"]);
         data[i].duration = parseFloat(String(data[i]["6.5 total hours"].split(" ", 1)));
+        var name = data[i].author.split(" ", 2);
+        data[i].initials = name[0][0] + "." + name[1][0];
     }
-
 
 
     const max_x = d3.max(data, d => d.duration);
@@ -18,7 +19,7 @@ d3.csv("resources/Kaggle-modified-Suddharshan.csv", function(data){ //this how l
     const min_y = d3.min(data, d => d.rating);
 
 
-
+ 
     //create x axis
     var xscale = d3.scaleLinear().range([25, 480]).domain([0, max_x]);
     var x_axis = d3.axisBottom(xscale).ticks(10);
@@ -50,24 +51,32 @@ d3.csv("resources/Kaggle-modified-Suddharshan.csv", function(data){ //this how l
 
   
 
-    //create visulazation
-    d3.select("#t2_canvas")
-        .selectAll("circle")
-        .data(data)
-        .enter()
-        .append("circle")
-            .attr("cx", (d) => xscale(d.duration))
-            .attr("cy", (d) => yscale(d.rating))
-            .attr("r", 5)
-            .style("fill", "#69b3a2");
+    //create a wrapper to hold dot and labels
+    var dots = d3.select("#t2_canvas") //we can store this selection in a variable to access quicker
+                .selectAll("dots")  //no dots in dom so we enter till we have length of data dots
+                .data(data)
+                .enter()
+                .append("g"); //for each dot we append a gtag that way we can append stuff into the g tag
 
+    //append the circle to the wrapper
+    dots.append("circle")
+        .attr("cx", (d) => xscale(d.duration))
+        .attr("cy", (d) => yscale(d.rating))
+        .attr("r", 5)
+        .style("fill", "#69b3a2");
 
+    //append the text to the wrapper
+    dots.append("text")
+            .text(d => d.initials)
+            .attr("x", (d) => xscale(d.duration))
+            .attr("y", (d) => yscale(d.rating));
+    
+    
+   
     
 });
 
 
-//TODO Fix x axis to floats
-//TODO Add initials to datapoint(more cleaning of data)
 //TODO Check whether the way i cleaned data was valid
 //TODO refactor into functions and learn scope of vars
 

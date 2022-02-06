@@ -100,3 +100,4 @@ function remove_least(){
 dataviz();
 
 //TODO fix scaling of graph
+//TODO refactor into functions and learns scoper of vars
