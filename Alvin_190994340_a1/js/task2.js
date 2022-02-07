@@ -5,9 +5,8 @@ d3.csv("resources/Kaggle-modified-Suddharshan.csv", function(data){ //this how l
 
     //clean data, may have to find a way to do it in place
     for (var i = 0; i<data.length; i++) {
-        data[i].author = data[i]["Gregory Sward"];
-        data[i].rating = parseFloat(data[i]["4.7"]);
-        data[i].duration = parseFloat(String(data[i]["6.5 total hours"].split(" ", 1)));
+        data[i].rating = parseFloat(data[i]["rat"]);
+        data[i].duration = parseFloat(String(data[i]["hours"].split(" ", 1)));
         var name = data[i].author.split(" ", 2);
         data[i].initials = name[0][0] + "." + name[1][0];
     }
