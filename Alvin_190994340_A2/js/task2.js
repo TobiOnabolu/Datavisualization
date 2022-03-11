@@ -1,72 +1,138 @@
+
+
 d3.json("./resources/task2.json", create_viz);
 
-
-function project(x,y){
-    var angle = x / 90 * Math.PI;
-    var radius  = y
-    //return the new x y coordinates
-    return [radius * Math.cos(angle), radius * Math.sin(angle)];
-}
 
 function create_viz(data){
     var nested_folders = d3.nest()
     .key(d => d.Folder)
     .entries(data.root);
 
-    var depth_scale = d3.scaleOrdinal().range(["#5EAFC6", "#FE9922", "#93c464", "#75739F"]);
-
+    var depth_scale = d3.scaleOrdinal().range(["#5EAFC6", "#FE9922", "#93c464"]);
+    var scale_boxes = d3.scaleLinear().domain([0,200]).range([1,5]);
 
     console.log(nested_folders);
 
-    var packed_folders = {key: "All Folder", values: nested_folders};
-    var root = d3.hierarchy(packed_folders, d => d.values); //change sum to fit size of circles
+    var packed_folders = {key: "All Folders", values: nested_folders};
+    var root = d3.hierarchy(packed_folders, d => d.values)
+                    .sum(d => d.size ? scale_boxes(d.size): undefined); //change sum to fit size of circles
         
-    var treeChart = d3.tree();
-    treeChart.size([200,200]);
+    var partition = d3.partition();
+    partition.size([1000,400]);
     
 
 
     d3.select("svg.task2")
         .append("g")
         .attr("id", "treeG")
-        .attr("transform", "translate(250, 250)")
+        .attr("transform", "translate(0, 20)")
         .selectAll("g")
-        .data(treeChart(root).descendants())
+        .data(partition(root).descendants())
         .enter()
         .append("g")
             .attr("class", "node2")
-            .attr("transform", d => `translate(${project(d.x, d.y)})`);
+            .attr("transform", d => `translate(${d.x0}, ${d.y0})`);
 
 
     d3.selectAll("g.node2")
-        .append("circle")
-        .attr("r", 10) //can use this to change size after too
-        .style("fill", d => depth_scale(d.depth))
+        .append("rect")
+        .attr("width", d => d.x1 - d.x0)
+        .attr("height", d => d.y1 - d.y0)
+        .style("fill", d => {
+            if (d.depth != 2) return depth_scale(d.depth);
+            var split = d.data.filename.split(".");
+            if (split[1] == "mp4") return "red";
+            else if (split[1] == "mp3") return "cyan";
+            return depth_scale(d.depth);
+            
+        })
         .style("stroke", "white")
-        .style("stroke-width", "2px");
-
+        .style("stroke", "black");
+        
 
     
     d3.selectAll("g.node2")
         .append("text")
         .style("text-anchor", "middle")
+        .attr("transform", d => `translate(${(d.x1 - d.x0)/2}, ${(d.y1 - d.y0)/2}) rotate(90) scale(0.75)`)
         .style("fill", "4f442b")
-        .text(d => d.data.filename || d.data.Folder || d.data.key);// make code to extract everything after period if filename
+        .text(d => {
+            if (d.data.filename){
+                var split = d.data.filename.split(".");
+                return split[1];
+            } 
+            return d.data.Folder || d.data.key
+        });
+
+    add_legend2();
+
+    d3.selectAll("svg.task2")
+        .append("text")
+        .attr("transform", "translate(20,435)")
+        .text("The most upper layer represents the whole dataset. The second layer is the data split into 4 folders. The final layer is the files under each folder.")
 
     
-    d3.select("#treeG")
-        .selectAll("line")
-        .data(treeChart(root).descendants().filter(d => d.parent)) //only draw lines from nodes with parents
-        .enter()
-        .insert("line", "g")
-        .attr("x1", d => project(d.parent.x, d.parent.y)[0])
-        .attr("y1", d => project(d.parent.x, d.parent.y)[1])
-        .attr("x2", d => project(d.x, d.y)[0])
-        .attr("y2", d => project(d.x, d.y)[1])
+}
+
+function add_legend2(){
+    d3.select("svg.task2")
+        .insert("g")
+        .attr("id", "legend2")
+        .attr("transform", "translate(15, 460)");
+
+
+
+    d3.select("#legend2")
+        .append("g")
+        .attr("id", "red_group")  
+        .attr("transform", "translate(0, 0)");
+
+    d3.select("#legend2")
+        .append("g")
+        .attr("id", "blue_group")
+        .attr("transform", "translate(0, 30)");
+
+    d3.select("#legend2")
+        .append("g")
+        .attr("id", "other")
+        .attr("transform", "translate(60, 0)");
+       
+
+    d3.select("#red_group")
+        .append("circle")
+        .attr("r", 10)
+        .style("fill", "red")
         .style("stroke", "black");
-    
-        
-    
+
+    d3.select("#red_group")
+        .append("text")
+        .attr("transform", "translate(15, 5)")
+        .style("fill", "4f442b")
+        .text("mp4");
+
+    d3.select("#blue_group")
+        .append("circle")
+        .attr("r", 10)
+        .style("fill", "cyan")
+        .style("stroke", "black");
+
+    d3.select("#blue_group")
+        .append("text")
+        .attr("transform", "translate(15, 5)")
+        .style("fill", "4f442b")
+        .text("mp3");
+
+    d3.select("#other")
+        .append("circle")
+        .attr("r", 10)
+        .style("fill", "#93c464")
+        .style("stroke", "black");
+
+    d3.select("#other")
+        .append("text")
+        .attr("transform", "translate(15, 5)")
+        .style("fill", "4f442b")
+        .text("Other Extensions");
 }
 
 

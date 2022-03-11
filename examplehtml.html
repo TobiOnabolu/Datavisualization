@@ -21,7 +21,9 @@
           .key(d => d.user)
           .entries(data.tweets);
         
+        console.log(nestedTweets);
         var packableTweets = {id: "All Tweets", values: nestedTweets};
+
         
         var root = d3.hierarchy(packableTweets, d => d.values)
           .sum(d => d.retweets ? d.retweets.length + d.favorites.length + 1 : undefined);

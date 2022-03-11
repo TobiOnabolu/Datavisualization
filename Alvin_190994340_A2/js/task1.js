@@ -8,6 +8,8 @@ function create_viz(data){
     var grade_scale = d3.scaleLinear().domain([0, 55, 100]).range(["#FF0D0D", "#FAB733", "#69B34C"]);
 
 
+
+
     //Make the hiearchy of the data by assigning grades to an array called values
     for (var i =0; i < data.Marks.length; i++){
         data.Marks[i] = 
@@ -29,6 +31,7 @@ function create_viz(data){
 
     packChart.padding(10);
 
+    console.log(packed_students)
     
     //Creat group elements to hold circles and text
     d3.select("svg.task1")
@@ -63,6 +66,7 @@ function create_viz(data){
             })
             .style("stroke", "black");
     
+            
     //Append text to group elements
     d3.selectAll("g.node")
             .append("text")
@@ -82,8 +86,67 @@ function create_viz(data){
             });
   
     
+    add_legend();
+    
+
+}
+
+function add_legend(){
+    var grade_scale = d3.scaleLinear().domain([0, 55, 100]).range(["#FF0D0D", "#FAB733", "#69B34C"]);
+
+    d3.select("svg.task1")
+    .insert("g")
+    .attr("class", "legend")
+    .attr("transform", "translate(-10, -10)")
+
+
+    var values = [
+        {
+            class: "redt1",
+            scale: 15,
+            text: "0-25"
+        },
+        {
+            class: "oranget1",
+            scale: 35,
+            text: "25-50"
+        },
+        {
+            class: "yellowt1",
+            scale: 60,
+            text: "50-75"
+        },
+        {
+            class: "greent1",
+            scale: 85,
+            text: "75-90"
+        },
+        {
+            class: "next_greent1",
+            scale: 95,
+            text: "90-100"
+        }
+
+    ];
+
+    for (var i = 0; i < values.length; i++){
+
+        d3.select("g.legend")
+            .append("g")
+            .attr("class", values[i].class)
+            .attr("transform", `translate(20, ${20*i + 20})`);
+
+        d3.select(`g.${values[i].class}`)
+            .append("circle")
+            .attr("r", 7)
+            .style("fill", grade_scale(values[i].scale))
+            .style("stroke", "black");
         
-    //TODO create grade legend to show grade distribution
+        d3.select(`g.${values[i].class}`)
+            .append("text")
+            .attr("transform", `translate(10, 5)`)
+            .text(`${values[i].text}`);
+    }
 
 
 }
